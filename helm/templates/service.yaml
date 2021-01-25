@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "sandbox-assignment-api.fullname" . }}
+  labels:
+    {{- include "sandbox-assignment-api.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 8080
+    targetPort: http
+    protocol: TCP
+  selector:
+    {{- include "sandbox-assignment-api.selectorLabels" . | nindent 4 }}

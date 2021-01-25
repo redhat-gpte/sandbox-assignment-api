@@ -1,0 +1,37 @@
+# Default values for sandbox-assignment-api.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+
+image:
+  repository: quay.io/redhat-gpte/open-cloud-access-sandbox-assignment-api
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+dynamodbSecret:
+  create: true
+  #aws_region: ...
+  #aws_access_key_id: ...
+  #aws_secret_access_key: ...
+
+jwtSecret:
+  create: true
+
+resources:
+  limits:
+    cpu: "1"
+    memory: 256Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

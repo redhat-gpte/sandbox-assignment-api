@@ -1,0 +1,14 @@
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "sandbox-assignment-api.fullname" . }}
+  labels:
+    {{- include "sandbox-assignment-api.labels" . | nindent 4 }}
+spec:
+  to:
+    kind: Service
+    name: {{ include "sandbox-assignment-api.fullname" . }}
+  port:
+    targetPort: http
+  tls:
+    termination: edge

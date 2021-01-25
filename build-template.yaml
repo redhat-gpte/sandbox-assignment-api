@@ -1,0 +1,66 @@
+---
+apiVersion: template.openshift.io/v1
+kind: Template
+metadata:
+  annotations:
+    description: Build open_cloud_access sandbox-account api
+  name: open-cloud-access-sandbox-account-api-build
+
+parameters:
+- name: NAME
+  required: true
+  value: open-cloud-access-sandbox-account-api
+- name: PYTHON_S2I_IMAGE
+  required: true
+  value: registry.access.redhat.com/ubi8/python-38:latest
+- name: GIT_REPO
+  required: true
+  value: git@github.com:redhat-gpe/open_cloud_access.git
+- name: CONTEXT_DIR
+  value: sandbox_assignment/api
+- name: DEPLOY_KEY
+  required: true
+
+objects:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: ${NAME}
+  spec:
+    lookupPolicy:
+      local: false
+
+- apiVersion: v1
+  kind: Secret
+  type: kubernetes.io/ssh-auth
+  metadata:
+    name: ${NAME}-deploy-key
+  stringData:
+    ssh-privatekey: |
+      ${DEPLOY_KEY}
+
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    name: ${NAME}
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: ${NAME}:latest
+    source:
+      contextDir: ${CONTEXT_DIR}
+      git:
+        uri: ${GIT_REPO}
+      sourceSecret:
+        name: ${NAME}-deploy-key
+      type: Git
+    strategy:
+      type: Source
+      sourceStrategy:
+        forcePull: true
+        from:
+          kind: DockerImage
+          name: ${PYTHON_S2I_IMAGE}
+    triggers: []
+...

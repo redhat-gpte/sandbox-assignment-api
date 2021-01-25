@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "sandbox-assignment-api.fullname" . }}
+  labels:
+    {{- include "sandbox-assignment-api.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "sandbox-assignment-api.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sandbox-assignment-api.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "sandbox-assignment-api.fullname" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: api
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "sandbox-assignment-api.fullname" . }}-dynamodb
+              key: aws_access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "sandbox-assignment-api.fullname" . }}-dynamodb
+              key: aws_secret_access_key
+        - name: AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "sandbox-assignment-api.fullname" . }}-dynamodb
+              key: aws_region
+        - name: SANDBOX_ACCOUNT_DB
+          value: sandbox_accounts
+        - name: SANDBOX_AUTHENTICATION_DB
+          value: sandbox_authentication
+        - name: JWT_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "sandbox-assignment-api.fullname" . }}-jwt
+              key: jwt_secret_key
+        image: "{{ .Values.image.repository }}:v{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        # TODO - Implement probes
+        #livenessProbe:
+        #  httpGet:
+        #    path: /healthz
+        #    port: http
+        #readinessProbe:
+        #  httpGet:
+        #    path: /healthz
+        #    port: http
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
