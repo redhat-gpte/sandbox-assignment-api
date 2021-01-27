@@ -460,7 +460,7 @@ else:
 # Init Flask, jwt, and api
 application = Flask(__name__)
 application.config['JWT_SECRET_KEY'] = jwt_secret_key
-application.config['JWT_ACCESS_TOKEN_EXPIRES'] = 6000
+application.config['JWT_ACCESS_TOKEN_EXPIRES'] = 300
 jwt = JWTManager(application)
 api = Api(application)
 
