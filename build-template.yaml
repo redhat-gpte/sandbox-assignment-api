@@ -3,13 +3,13 @@ apiVersion: template.openshift.io/v1
 kind: Template
 metadata:
   annotations:
-    description: Build open_cloud_access sandbox-account api
-  name: open-cloud-access-sandbox-account-api-build
+    description: Build sandbox-assignment-api
+  name: sandbox-assignment-api-build
 
 parameters:
 - name: NAME
   required: true
-  value: open-cloud-access-sandbox-account-api
+  value: sandbox-assignment-api
 - name: PYTHON_S2I_IMAGE
   required: true
   value: registry.access.redhat.com/ubi8/python-38:latest
