@@ -1,5 +1,5 @@
 ---
-name: sandbox_assignment-api
+name: release
 on:
   push:
     branches-ignore:
