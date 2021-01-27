@@ -1,5 +1,5 @@
 ---
-name: sandbox_assignment-api
+name: release
 on:
   push:
     branches-ignore:
@@ -9,8 +9,8 @@ on:
 jobs:
   publish:
     env:
-      CONTEXT_DIR: sandbox_assignment/api
-      IMAGE_NAME: open-cloud-access-sandbox-assignment-api
+      CONTEXT_DIR: api
+      IMAGE_NAME: sandbox-assignment-api
     runs-on: ubuntu-latest
     steps:
     - name: Checkout source
