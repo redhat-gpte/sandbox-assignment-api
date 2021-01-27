@@ -15,11 +15,9 @@ parameters:
   value: registry.access.redhat.com/ubi8/python-38:latest
 - name: GIT_REPO
   required: true
-  value: git@github.com:redhat-gpe/open_cloud_access.git
+  value: https://github.com/redhat-gpte/sandbox-assignment-api.git
 - name: CONTEXT_DIR
-  value: sandbox_assignment/api
-- name: DEPLOY_KEY
-  required: true
+  value: api
 
 objects:
 - apiVersion: image.openshift.io/v1
@@ -29,15 +27,6 @@ objects:
   spec:
     lookupPolicy:
       local: false
-
-- apiVersion: v1
-  kind: Secret
-  type: kubernetes.io/ssh-auth
-  metadata:
-    name: ${NAME}-deploy-key
-  stringData:
-    ssh-privatekey: |
-      ${DEPLOY_KEY}
 
 - apiVersion: build.openshift.io/v1
   kind: BuildConfig
@@ -52,8 +41,6 @@ objects:
       contextDir: ${CONTEXT_DIR}
       git:
         uri: ${GIT_REPO}
-      sourceSecret:
-        name: ${NAME}-deploy-key
       type: Git
     strategy:
       type: Source

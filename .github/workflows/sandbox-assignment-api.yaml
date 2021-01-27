@@ -5,7 +5,7 @@ on:
     branches-ignore:
     - '*'
     tags:
-    - 'sandbox-assignment-api-v[0-9]*'
+    - 'v[0-9]*'
 jobs:
   publish:
     env:
@@ -20,19 +20,23 @@ jobs:
       id: image_tags
       run: |
         # Version is a semantic version tag or semantic version with release number
-        # Ex: sandbox-assignment-api-v0.1.0, sandbox-assignment-api-v0.1.0-1
-        RELEASE=${GITHUB_REF#refs/tags/sandbox-assignment-api-}
+        # GITHUB_REF will be of the form "refs/tags/v0.1.2" or "refs/tags/v0.1.2-1"
+        # To determine RELEASE, strip off the leading "refs/tags/"
+        RELEASE=${GITHUB_REF#refs/tags/}
+        # To determine VERSION, strip off any release number suffix
         VERSION=${RELEASE/-*/}
         echo "::set-output name=RELEASE::${RELEASE}"
         echo "::set-output name=VERSION::${VERSION}"
 
         # Only build image if version tag without release number
+        # Releases indicate a change in the repository that should not trigger a new build.
         if [[ "${VERSION}" == "${RELEASE}" ]]; then
           # Publish to latest, minor, and patch tags
+          # Ex: latest,v0.1.2,v0.1
           IMAGE_TAGS=(
             '${{ secrets.REGISTRY_URI }}/${{ secrets.REGISTRY_REPOSITORY }}/${{ env.IMAGE_NAME }}:latest'
-            "${{ secrets.REGISTRY_URI }}/${{ secrets.REGISTRY_REPOSITORY }}/${{ env.IMAGE_NAME }}:${VERSION}"
             "${{ secrets.REGISTRY_URI }}/${{ secrets.REGISTRY_REPOSITORY }}/${{ env.IMAGE_NAME }}:${VERSION%.*}"
+            "${{ secrets.REGISTRY_URI }}/${{ secrets.REGISTRY_REPOSITORY }}/${{ env.IMAGE_NAME }}:${VERSION}"
           )
           # Set IMAGE_TAGS output for use in next step
           ( IFS=$','; echo "::set-output name=IMAGE_TAGS::${IMAGE_TAGS[*]}" )

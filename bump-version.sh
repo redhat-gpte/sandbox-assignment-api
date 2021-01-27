@@ -2,7 +2,7 @@
 
 RELEASE=$1
 VERSION=${RELEASE/-*/}
-CURRENT_RELEASE=$(git tag | sed -nr 's/^sandbox-assignment-api-v([0-9].*)/\1/p' | sort -V | tail -1)
+CURRENT_RELEASE=$(git tag | sed -nr 's/^v([0-9].*)/\1/p' | sort -V | tail -1)
 CURRENT_VERSION=${CURRENT_RELEASE/-*/}
 
 if [[ -z "${VERSION}" ]]; then
@@ -10,7 +10,7 @@ if [[ -z "${VERSION}" ]]; then
     RELEASE=${VERSION}
 fi
 
-TAG=sandbox-assignment-api-v${RELEASE}
+TAG=v${RELEASE}
 
 if [[ ! $RELEASE =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+)?$ ]]; then
     echo "VERSION must be a semantic version: MAJOR.MINOR.PATCH or MAJOR.MINOR.PATCH-RELEASE"
