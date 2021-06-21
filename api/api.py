@@ -3,7 +3,7 @@ from flask_jwt_extended import JWTManager, jwt_required, create_access_token
 from flask_restful import Resource, Api, reqparse
 import boto3
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 
 class Token(Resource):
@@ -196,16 +196,20 @@ class Sandbox(Resource):
             # else:
             #     return {'message': 'account not found'}, 404
 
-        # Get a list of available accounts
+        # Get a list of available accounts not used in the last 24 hours
+        yesterday = (datetime.now() - timedelta(hours=24)).strftime('%FT%T+00:00')
         accounts = self.db.scan(
             TableName=self.table,
-            FilterExpression='available = :avail and attribute_exists(account_id) and cloud_provider = :cp',
+            filter_expression='available = :avail and attribute_exists(account_id) and cloud_provider = :cp and deprovision_time <= :dt',
             ExpressionAttributeValues={
                 ":avail": {
                     "BOOL": True
                 },
                 ":cp": {
                     "S": args['cloud_provider']
+                },
+                ":dt": {
+                    "S": yesterday
                 }
             },
             ConsistentRead=True
